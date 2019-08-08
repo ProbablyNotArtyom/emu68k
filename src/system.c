@@ -26,12 +26,14 @@
 #define		UART_DATA_DEFAULT		0x00EFFC07
 #define		UART_STATUS_DEFAULT		0x00EFFC03
 
+#define		M68K_CPU_TYPE_DEFAULT	M68K_CPU_TYPE_68020
+
 //---------------------------------------------------
 
 bool		freerun = false;
 int			steps = 0;
 
-int				cpu_type = M68K_CPU_TYPE_68000;
+int				cpu_type;
 unsigned int	cpu_fcodes;
 int				cpu_trap_charin, cpu_trap_charout;
 
@@ -84,7 +86,21 @@ void init_ui(){
 	}
 
 	tmp = gtk_builder_get_object(builder, "CPUselect");
-	gtk_combo_box_set_active(tmp, 0);
+	cpu_type = M68K_CPU_TYPE_DEFAULT;
+	switch(cpu_type) {
+		case M68K_CPU_TYPE_68000:
+			gtk_combo_box_set_active(tmp, 0);
+			break;
+		case M68K_CPU_TYPE_68010:
+			gtk_combo_box_set_active(tmp, 1);
+			break;
+		case M68K_CPU_TYPE_68020:
+			gtk_combo_box_set_active(tmp, 2);
+			break;
+		case M68K_CPU_TYPE_68030:
+			gtk_combo_box_set_active(tmp, 3);
+			break;
+	}
 
 	m68k_init();
 	m68k_set_cpu_type(cpu_type);
@@ -174,6 +190,7 @@ void update_sysconfig(){
 			cpu_type = M68K_CPU_TYPE_68030;
 			break;
 	}
+	m68k_set_cpu_type(cpu_type);
 }
 
 #define 	UI_UPDATE_REG(a, b) 						\
