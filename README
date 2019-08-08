@@ -1,0 +1,3 @@
+Gtk+ frontend for the mutashi 68000 emulator. 
+
+to build, just run make all in the root directory
