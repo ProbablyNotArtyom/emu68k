@@ -17,6 +17,7 @@
 	#include <string.h>
 	#include <gtk/gtk.h>
 	#include <vte/vte.h>
+	#include <libgen.h>
 
 //------------------Function Protos------------------
 
@@ -48,7 +49,13 @@ int main (int argc, char *argv[]) {
     gtk_init(&argc, &argv);
 
     builder = gtk_builder_new();
-    gtk_builder_add_from_file (builder, "GTK.glade", NULL);
+	/* find the install location of the binary in this system */
+	char bindir[400];
+	ssize_t pathsize = readlink("/proc/self/exe", bindir, sizeof(bindir)-1);
+	char gladeptr[400];
+	strcpy(gladeptr, dirname(bindir));
+	strcat(gladeptr, "/GTK.glade");
+    gtk_builder_add_from_file (builder, gladeptr, NULL);
 
     window = GTK_WIDGET(gtk_builder_get_object(builder, "Sim_main"));
     SYSconfig = GTK_WIDGET(gtk_builder_get_object(builder, "SYS_prefs"));

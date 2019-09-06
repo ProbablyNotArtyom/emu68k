@@ -1,6 +1,8 @@
 export
 
-BASEDIR := $(PWD)
+PREFIX ?= /usr/share
+
+BASEDIR := $(shell pwd)
 BINDIR := $(BASEDIR)/bin
 BINARY_NAME := emu68k
 SOURCES := $(shell find ./src -name '*.c')
@@ -13,7 +15,7 @@ LD = ld
 CCFLAGS := -w -rdynamic -no-pie `pkg-config --cflags --libs gtk+-3.0 vte-2.91`
 LDFLAGS := -w -rdynamic -no-pie `pkg-config --libs gtk+-3.0 vte-2.91`
 
-.PHONY: all clean run
+.PHONY: all clean run install uninstall
 all: $(OBJECTS) $(BINARY_NAME)
 	cp $(BASEDIR)/src/GTK.glade $(BINDIR)
 
@@ -23,6 +25,15 @@ clean:
 
 run: all
 	cd $(BINDIR) && ./$(BINARY_NAME) $(BASEDIR)/gdos.bin && cd $(BASEDIR)
+
+install:
+	sudo mkdir -vp $(PREFIX)/emu68k/
+	sudo cp $(BINDIR)/$(BINARY_NAME) $(BINDIR)/GTK.glade $(PREFIX)/emu68k
+	sudo ln -s $(PREFIX)/emu68k/$(BINARY_NAME) /usr/bin/
+
+uninstall:
+	sudo rm -rf $(PREFIX)/emu68k
+	sudo rm -f /usr/bin/$(BINARY_NAME)
 
 .SECONDEXPANSION :
 $(BINARY_NAME): $(OBJECTS)
