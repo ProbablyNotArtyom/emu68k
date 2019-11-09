@@ -49,6 +49,9 @@ bool autorun = false;
 bool ui_input_locked = true;
 int	vte_char_delay = 0;
 
+// CPU execution Stuff
+int instructions_per_step = 1;
+
 static char 	*helptxt = {
 	"Gtk frontend for the Musashi m68k CPU simulator\r\n"
 	"Usage: emu68k [-h][-d][-r] path_to_rom\r\n"
@@ -203,7 +206,7 @@ void on_Run_clicked() {
 
 void on_StepCount_changed() {
 	GtkWidget *tmp = gtk_builder_get_object(builder, "spinbutton1");
-	steps = gtk_spin_button_get_value_as_int(tmp);
+	instructions_per_step = gtk_spin_button_get_value_as_int(tmp);
 }
 
 void on_Chardelay_changed() {
@@ -217,9 +220,15 @@ void on_StepOver_clicked() {
 	update_ui_regs();
 }
 
-void on_Step_clicked() {
+void on_Steponce_clicked() {
 	freerun = false;
 	steps = 1;
+	update_ui_regs();
+}
+
+void on_Step_clicked() {
+	freerun = false;
+	steps = instructions_per_step;
 	update_ui_regs();
 }
 
