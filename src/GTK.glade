@@ -3,6 +3,11 @@
 <interface>
   <requires lib="gtk+" version="3.12"/>
   <requires lib="vte-2.91" version="0.42"/>
+  <object class="GtkAdjustment" id="Chardelay">
+    <property name="upper">10000</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
   <object class="GtkDialog" id="Dialog_mm_change">
     <property name="can_focus">True</property>
     <property name="has_focus">True</property>
@@ -141,8 +146,10 @@ Any ROMs will need to be reloaded.</property>
       </object>
     </child>
   </object>
-  <object class="GtkAdjustment" id="Steps">
-    <property name="upper">10000</property>
+  <object class="GtkAdjustment" id="Stepcount">
+    <property name="lower">1</property>
+    <property name="upper">100000</property>
+    <property name="value">1</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
@@ -430,7 +437,6 @@ Any ROMs will need to be reloaded.</property>
                                 <property name="margin_right">3</property>
                                 <property name="margin_top">6</property>
                                 <property name="margin_bottom">6</property>
-                                <signal name="clicked" handler="on_StepCount_clicked" swapped="no"/>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -446,11 +452,12 @@ Any ROMs will need to be reloaded.</property>
                                 <property name="text" translatable="yes">0</property>
                                 <property name="progress_pulse_step">1</property>
                                 <property name="input_purpose">digits</property>
-                                <property name="adjustment">Steps</property>
+                                <property name="adjustment">Stepcount</property>
                                 <property name="climb_rate">1</property>
                                 <property name="snap_to_ticks">True</property>
                                 <property name="numeric">True</property>
                                 <property name="update_policy">if-valid</property>
+                                <signal name="value-changed" handler="on_StepCount_changed" swapped="no"/>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1550,17 +1557,75 @@ Any ROMs will need to be reloaded.</property>
               </packing>
             </child>
             <child>
-              <object class="VteTerminal" id="Terminal">
-                <property name="width_request">315</property>
+              <object class="GtkBox">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="hscroll_policy">natural</property>
-                <property name="vscroll_policy">natural</property>
-                <property name="backspace_binding">ascii-delete</property>
-                <property name="delete_binding">ascii-delete</property>
-                <property name="scroll_on_keystroke">True</property>
-                <property name="scroll_on_output">False</property>
-                <signal name="commit" handler="on_Terminal_commit" swapped="no"/>
+                <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="VteTerminal" id="Terminal">
+                    <property name="width_request">315</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="hscroll_policy">natural</property>
+                    <property name="vscroll_policy">natural</property>
+                    <property name="backspace_binding">ascii-delete</property>
+                    <property name="delete_binding">ascii-delete</property>
+                    <property name="scroll_on_keystroke">True</property>
+                    <property name="scroll_on_output">False</property>
+                    <signal name="commit" handler="on_Terminal_commit" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="margin_left">4</property>
+                    <property name="margin_right">4</property>
+                    <property name="margin_top">4</property>
+                    <property name="margin_bottom">4</property>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Character Delay</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="padding">4</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkSpinButton" id="VTE_Speed">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="text" translatable="yes">0</property>
+                        <property name="progress_pulse_step">1</property>
+                        <property name="input_purpose">digits</property>
+                        <property name="adjustment">Chardelay</property>
+                        <property name="value">2.2351741811588166e-10</property>
+                        <signal name="value-changed" handler="on_Chardelay_changed" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="padding">4</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="expand">True</property>

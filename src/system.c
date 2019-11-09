@@ -30,6 +30,9 @@
 
 //---------------------------------------------------
 
+extern int	vte_char_delay;
+
+extern bool	doExit;
 bool		freerun = false;
 int			steps = 0;
 
@@ -393,7 +396,7 @@ void cpu_write_byte(unsigned int address, unsigned int value){
 	} else if (address >= rom_start && address <= rom_end) {
 		WRITE_BYTE(addrspace_rom, address, value);
 	} else if (address == uart_data) {
-		vte_terminal_feed(Terminal, &value, 1);
+		vte_putchar(&value);
 	} else if (address == uart_status) {
 		return;
 	} else {
@@ -407,7 +410,7 @@ void cpu_write_word(unsigned int address, unsigned int value){
 	} else if (address >= rom_start && address <= rom_end) {
 		WRITE_WORD(addrspace_rom, address, value);
 	} else if (address == uart_data) {
-		vte_terminal_feed(Terminal, &value, 1);
+		vte_putchar(&value);
 	} else if (address == uart_status) {
 		return;
 	} else {
@@ -421,7 +424,7 @@ void cpu_write_long(unsigned int address, unsigned int value){
 	} else if (address >= rom_start && address <= rom_end) {
 		WRITE_LONG(addrspace_rom, address, value);
 	} else if (address == uart_data) {
-		vte_terminal_feed(Terminal, &value, 1);
+		vte_putchar(&value);
 	} else if (address == uart_status) {
 		return;
 	} else {

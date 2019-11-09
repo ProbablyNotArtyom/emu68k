@@ -38,9 +38,9 @@ uninstall:
 .SECONDEXPANSION :
 $(BINARY_NAME): $(OBJECTS)
 	@echo "[LD] Creating final binary"
-	@$(CC) $(shell find $(BINDIR) -name '*.o') $(LDFLAGS) -o $(BINDIR)/$@
+	@$(CC) $(shell find $(BINDIR) -name '*.o') $(LDFLAGS) -o $(BINDIR)/$@ -pthread
 
 $(OBJECTS): $$(patsubst $$(BINDIR)%.o, $$(BASEDIR)%.c, $$@)
 	@echo "[CC] -c $(shell realpath -m --relative-to=$(PWD) $(patsubst $(BINDIR)%, $(BASEDIR)%, $(@:%.o=%.c))) -o $(shell realpath -m --relative-to=$(PWD) $(@))"
 	@mkdir -p $(dir $@)
-	@$(CC) $(CCFLAGS) -c $(patsubst $(BINDIR)%, $(BASEDIR)%, $(@:%.o=%.c)) -o $@
+	@$(CC) $(CCFLAGS) -c $(patsubst $(BINDIR)%, $(BASEDIR)%, $(@:%.o=%.c)) -o $@ -pthread

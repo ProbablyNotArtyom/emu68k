@@ -18,6 +18,7 @@
 	#include <gtk/gtk.h>
 	#include <vte/vte.h>
 	#include <libgen.h>
+	#include <pthread.h>
 
 //------------------Function Protos------------------
 
@@ -37,17 +38,58 @@ GtkBuilder	*builder;
 
 #define ui_regentry_lock()		gtk_widget_set_sensitive(ui_regentry_frame, false)
 #define ui_regentry_unlock()	gtk_widget_set_sensitive(ui_regentry_frame, true)
-static bool doExit = false;
-static bool running = false;
+
+// Global flags set by passed args
+bool doExit = false;
+bool running = false;
+bool debug = false;
+bool autorun = false;
+
+// Stuff for handling UI interaction
 bool ui_input_locked = true;
+int	vte_char_delay = 0;
+
+static char 	*helptxt = {
+	"Gtk frontend for the Musashi m68k CPU simulator\r\n"
+	"Usage: emu68k [-h][-d][-r] path_to_rom\r\n"
+	"\r\n"
+	"    -h           shows this help text\r\n"
+	"    -r           automatically reset & run the CPU\r\n"
+	"                 requires a ROM to be passed from the shell\r\n"
+	"    -d           enables debug mode\r\n"
+};
 
 //-----------------------Main------------------------
 
 int main (int argc, char *argv[]) {
-    GtkWidget       *window;
+    GtkWidget *window;
+	int opt;
+	char *rom_filename = NULL;
+
+	while ((opt = getopt(argc, argv, "rhd")) != -1) {
+		switch (opt) {
+			case 'r':
+				autorun = true;
+				break;
+			case 'h':
+				fprintf(stderr, helptxt);
+				exit(0);
+				break;
+			case 'd':
+				printf("Debug mode enabled\n");
+				debug = true;
+				break;
+			default:
+				break;
+		}
+	}
+
+	for (int index = optind; index < argc; index++) {
+		if (debug) printf("Parsed ROM file: %s\n", argv[index]);
+		rom_filename = argv[index];
+	}
 
     gtk_init(&argc, &argv);
-
     builder = gtk_builder_new();
 	/* find the install location of the binary in this system */
 	char bindir[400];
@@ -71,11 +113,17 @@ int main (int argc, char *argv[]) {
     gtk_builder_connect_signals(builder, NULL);
 	init_ui();
 	memViewUpdate(memViewBuffer);
-
     gtk_widget_show_all(window);
 	vte_terminal_feed(VTE_TERMINAL(Terminal), "", 0);
-	if (argc > 1) {
-		load_rom(argv[1]);
+
+	if (rom_filename != NULL) {
+		load_rom(rom_filename);
+		if (autorun) {
+			freerun = false;
+			m68k_pulse_reset();
+			freerun = true;
+			update_ui_regs();
+		}
 	}
 
 	while(doExit == false){
@@ -153,10 +201,14 @@ void on_Run_clicked() {
 	update_ui_regs();
 }
 
-void on_StepCount_clicked() {
-	freerun = false;
+void on_StepCount_changed() {
 	GtkWidget *tmp = gtk_builder_get_object(builder, "spinbutton1");
 	steps = gtk_spin_button_get_value_as_int(tmp);
+}
+
+void on_Chardelay_changed() {
+	GtkWidget *tmp = gtk_builder_get_object(builder, "VTE_Speed");
+	vte_char_delay = gtk_spin_button_get_value_as_int(tmp);
 }
 
 void on_StepOver_clicked() {
