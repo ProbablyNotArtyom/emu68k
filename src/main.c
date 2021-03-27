@@ -54,22 +54,25 @@ int instructions_per_step = 1;
 
 static char 	*helptxt = {
 	"Gtk frontend for the Musashi m68k CPU simulator\r\n"
-	"Usage: emu68k [-h][-d][-r] path_to_rom\r\n"
+	"Usage: emu68k [-hdr][-t tickscale] path_to_rom\r\n"
 	"\r\n"
-	"    -h           shows this help text\r\n"
-	"    -r           automatically reset & run the CPU\r\n"
-	"                 requires a ROM to be passed from the shell\r\n"
-	"    -d           enables debug mode\r\n"
+	"    -h               shows this help text\r\n"
+	"    -r               automatically reset & run the CPU\r\n"
+	"                     requires a ROM to be passed from the shell\r\n"
+	"    -d               enables debug mode\r\n"
+	"    -t tickscale     set the number of cycles in each emulation tick\r\n"
+	"                     this is effectively a simulation speed multiplier\r\n"
+	"                     high tickscales increase performance by sacrificing IO bandwith\r\n"
 };
 
 //-----------------------Main------------------------
 
 int main (int argc, char *argv[]) {
     GtkWidget *window;
-	int opt;
+	int opt, tickscale = 100000;
 	char *rom_filename = NULL;
 
-	while ((opt = getopt(argc, argv, "rhd")) != -1) {
+	while ((opt = getopt(argc, argv, "rhdt:")) != -1) {
 		switch (opt) {
 			case 'r':
 				autorun = true;
@@ -81,6 +84,10 @@ int main (int argc, char *argv[]) {
 			case 'd':
 				printf("Debug mode enabled\n");
 				debug = true;
+				break;
+			case 't':
+				tickscale = strtoul(optarg, NULL, 10);
+				printf("tickscale set to %d\n", tickscale);
 				break;
 			default:
 				break;
@@ -131,7 +138,7 @@ int main (int argc, char *argv[]) {
 
 	while(doExit == false){
 		gtk_main_iteration();
-		system_tick();
+		system_tick(tickscale);
 	}
 
     return 0;
@@ -271,13 +278,11 @@ void open_memory_view() {
 }
 
 void memView_up() {
-	if (memView_address < 0xFFFFFE00)
-		memView_address = memView_address + 0x200;
+	if (memView_address < 0xFFFFFE00) memView_address = memView_address + 0x200;
 	memViewUpdate(memViewBuffer);
 }
 
 void memView_down() {
-	if (memView_address > 0x00)
-		memView_address = memView_address - 0x200;
+	if (memView_address > 0x00) memView_address = memView_address - 0x200;
 	memViewUpdate(memViewBuffer);
 }

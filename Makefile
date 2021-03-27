@@ -12,8 +12,8 @@ CC = gcc
 AR = ar
 LD = ld
 
-CCFLAGS := -w -rdynamic -no-pie `pkg-config --cflags --libs gtk+-3.0 vte-2.91`
-LDFLAGS := -w -rdynamic -no-pie `pkg-config --libs gtk+-3.0 vte-2.91`
+CCFLAGS := -w -rdynamic -no-pie $(shell pkg-config --cflags --libs gtk+-3.0 vte-2.91) -O3
+LDFLAGS := -w -rdynamic -no-pie $(shell pkg-config --libs gtk+-3.0 vte-2.91)
 
 .PHONY: all clean run install uninstall
 all: $(OBJECTS) $(BINARY_NAME)

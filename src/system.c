@@ -17,17 +17,6 @@
 	#include "musashi/m68k.h"
 	#include "config.h"
 
-#define 	RAM_START_DEFAULT	0x00100000
-#define 	RAM_END_DEFAULT		0x007FFFFF
-
-#define 	ROM_START_DEFAULT	0x00000000
-#define 	ROM_END_DEFAULT		0x000FFFFF
-
-#define		UART_DATA_DEFAULT		0x00EFFC07
-#define		UART_STATUS_DEFAULT		0x00EFFC03
-
-#define		M68K_CPU_TYPE_DEFAULT	M68K_CPU_TYPE_68020
-
 //---------------------------------------------------
 
 extern int	vte_char_delay;
@@ -249,10 +238,10 @@ void load_rom(char *fname){
 	}
 }
 
-void system_tick(){
+void system_tick(u_int ticks){
 	if (freerun) {
 		gtk_spinner_start(activeSpin);
-		m68k_execute(10000);
+		m68k_execute(ticks);
 	} else {
 		while (steps > 0) {
 			m68k_execute(1);
@@ -267,8 +256,7 @@ void system_tick(){
 }
 
 void cpu_instr_callback(){
-	if (freerun == false)
-		update_ui_regs();
+	if (freerun == false) update_ui_regs();
 }
 
 void cpu_set_fc(unsigned int fc){
@@ -279,155 +267,100 @@ int cpu_irq_ack(int level) {
 	return M68K_INT_ACK_SPURIOUS;
 }
 
-void make_hex(char* buff, unsigned int pc, unsigned int length)
-{
-	char* ptr = buff;
+void make_hex(char* buff, unsigned int pc, unsigned int length) {
+	char *ptr = buff;
 
-	for(;length>0;length -= 2)
-	{
+	for(; length>0; length -= 2) {
 		sprintf(ptr, "%04x", cpu_read_word_dasm(pc));
 		pc += 2;
 		ptr += 4;
-		if(length > 2)
-			*ptr++ = ' ';
+		if(length > 2) *ptr++ = ' ';
 	}
 }
 
 //---------------------------------------------------
 
 unsigned int  cpu_read_byte(unsigned int address){
-	if (address >= ram_start && address <= ram_end) {
-		return READ_BYTE(addrspace_ram, address);
-	} else if (address >= rom_start && address <= rom_end) {
-		return READ_BYTE(addrspace_rom, address);
-	} else if (address == uart_data) {
-		return uart_input_buff;
-	} else if (address == uart_status) {
+	if (address >= ram_start && address <= ram_end) return READ_BYTE(addrspace_ram, address);
+	else if (address >= rom_start && address <= rom_end) return READ_BYTE(addrspace_rom, address);
+	else if (address == uart_data) return uart_input_buff;
+	else if (address == uart_status) {
 		if (uart_status_byte == 0b00000101) {
 			uart_status_byte = 0b00000100;
 			return 0b00000101;
-		} else {
-			return 0b00000100;
-		}
-	} else {
-		return 0x00;
-	}
+		} else return 0b00000100;
+	} else return 0x00;
 }
 
 unsigned int  cpu_read_word(unsigned int address){
-	if (address >= ram_start && address <= ram_end) {
-		return READ_WORD(addrspace_ram, address);
-	} else if (address >= rom_start && address <= rom_end) {
-		return READ_WORD(addrspace_rom, address);
-	} else if (address == uart_data) {
-		return uart_input_buff;
-	} else if (address == uart_status) {
+	if (address >= ram_start && address <= ram_end) return READ_WORD(addrspace_ram, address);
+	else if (address >= rom_start && address <= rom_end) return READ_WORD(addrspace_rom, address);
+	else if (address == uart_data) return uart_input_buff;
+	else if (address == uart_status) {
 		if (uart_status_byte == 0b00000101) {
 			uart_status_byte = 0b00000100;
 			return 0b00000101;
-		} else {
-			return 0b00000100;
-		}
-	} else {
-		return 0x00;
-	}
+		} else return 0b00000100;
+	} else return 0x00;
 }
 
 unsigned int  cpu_read_long(unsigned int address){
-	if (address >= ram_start && address <= ram_end) {
-		return READ_LONG(addrspace_ram, address);
-	} else if (address >= rom_start && address <= rom_end) {
-		return READ_LONG(addrspace_rom, address);
-	} else if (address == uart_data) {
-		return uart_input_buff;
-	} else if (address == uart_status) {
+	if (address >= ram_start && address <= ram_end) return READ_LONG(addrspace_ram, address);
+	else if (address >= rom_start && address <= rom_end) return READ_LONG(addrspace_rom, address);
+	else if (address == uart_data) return uart_input_buff;
+	else if (address == uart_status) {
 		if (uart_status_byte == 0b00000101) {
 			uart_status_byte = 0b00000100;
 			return 0b00000101;
-		} else {
-			return 0b00000100;
-		}
-	} else {
-		return 0x00;
-	}
+		} else return 0b00000100;
+	} else return 0x00;
 }
 
 unsigned int cpu_read_word_dasm(unsigned int address){
-	if (address >= ram_start && address <= ram_end) {
-		return READ_WORD(addrspace_ram, address);
-	} else if (address >= rom_start && address <= rom_end) {
-		return READ_WORD(addrspace_rom, address);
-	} else if (address == uart_data) {
-		return uart_input_buff;
-	} else if (address == uart_status) {
+	if (address >= ram_start && address <= ram_end) return READ_WORD(addrspace_ram, address);
+	else if (address >= rom_start && address <= rom_end) return READ_WORD(addrspace_rom, address);
+	else if (address == uart_data) return uart_input_buff;
+	else if (address == uart_status) {
 		if (uart_status_byte == 0b00000101) {
 			uart_status_byte = 0b00000100;
 			return 0b00000101;
-		} else {
-			return 0b00000100;
-		}
-	} else {
-		return 0x00;
-	}
+		} else return 0b00000100;
+	} else return 0x00;
 }
 
 unsigned int cpu_read_long_dasm(unsigned int address){
-	if (address >= ram_start && address <= ram_end) {
-		return READ_LONG(addrspace_ram, address);
-	} else if (address >= rom_start && address <= rom_end) {
-		return READ_LONG(addrspace_rom, address);
-	} else if (address == uart_data) {
-		return uart_input_buff;
-	} else if (address == uart_status) {
+	if (address >= ram_start && address <= ram_end) return READ_LONG(addrspace_ram, address);
+	else if (address >= rom_start && address <= rom_end) return READ_LONG(addrspace_rom, address);
+	else if (address == uart_data) return uart_input_buff;
+	else if (address == uart_status) {
 		if (uart_status_byte == 0b00000101) {
 			uart_status_byte = 0b00000100;
 			return 0b00000101;
-		} else {
-			return 0b00000100;
-		}
-	} else {
-		return 0x00;
-	}
+		} else return 0b00000100;
+	} else return 0x00;
 }
+
 /* Write to anywhere */
 void cpu_write_byte(unsigned int address, unsigned int value){
-	if (address >= ram_start && address <= ram_end) {
-		WRITE_BYTE(addrspace_ram, address, value);
-	} else if (address >= rom_start && address <= rom_end) {
-		WRITE_BYTE(addrspace_rom, address, value);
-	} else if (address == uart_data) {
-		vte_putchar(&value);
-	} else if (address == uart_status) {
-		return;
-	} else {
-		return;
-	}
+	if (address >= ram_start && address <= ram_end) WRITE_BYTE(addrspace_ram, address, value);
+	else if (address >= rom_start && address <= rom_end) WRITE_BYTE(addrspace_rom, address, value);
+	else if (address == uart_data) vte_putchar(&value);
+	else if (address == uart_status) return;
+	else return;
 }
 
 void cpu_write_word(unsigned int address, unsigned int value){
-	if (address >= ram_start && address <= ram_end) {
-		WRITE_WORD(addrspace_ram, address, value);
-	} else if (address >= rom_start && address <= rom_end) {
-		WRITE_WORD(addrspace_rom, address, value);
-	} else if (address == uart_data) {
-		vte_putchar(&value);
-	} else if (address == uart_status) {
-		return;
-	} else {
-		return;
-	}
+	if (address >= ram_start && address <= ram_end) WRITE_WORD(addrspace_ram, address, value);
+	else if (address >= rom_start && address <= rom_end) WRITE_WORD(addrspace_rom, address, value);
+	else if (address == uart_data) vte_putchar(&value);
+	else if (address == uart_status) return;
+	else return;
 }
 
 void cpu_write_long(unsigned int address, unsigned int value){
-	if (address >= ram_start && address <= ram_end) {
-		WRITE_LONG(addrspace_ram, address, value);
-	} else if (address >= rom_start && address <= rom_end) {
-		WRITE_LONG(addrspace_rom, address, value);
-	} else if (address == uart_data) {
-		vte_putchar(&value);
-	} else if (address == uart_status) {
-		return;
-	} else {
-		return;
-	}
+	if (address >= ram_start && address <= ram_end) WRITE_LONG(addrspace_ram, address, value);
+	else if (address >= rom_start && address <= rom_end) WRITE_LONG(addrspace_rom, address, value);
+	else if (address == uart_data) vte_putchar(&value);
+	else if (address == uart_status) return;
+	else return;
 }
