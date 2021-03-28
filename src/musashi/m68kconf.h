@@ -24,6 +24,9 @@
 #ifndef M68KCONF__HEADER
 #define M68KCONF__HEADER
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Configuration switches.
  * Use OPT_SPECIFY_HANDLER for configuration options that allow callbacks.
@@ -79,14 +82,14 @@
  * If off, all interrupts will be autovectored and all interrupt requests will
  * auto-clear when the interrupt is serviced.
  */
-#define M68K_EMULATE_INT_ACK        OPT_OFF
+#define M68K_EMULATE_INT_ACK        OPT_ON
 #define M68K_INT_ACK_CALLBACK(A)    cpu_irq_ack(A)
 
 
 /* If ON, CPU will call the breakpoint acknowledge callback when it encounters
  * a breakpoint instruction and it is running a 68010+.
  */
-#define M68K_EMULATE_BKPT_ACK       OPT_OFF
+#define M68K_EMULATE_BKPT_ACK       OPT_ON
 #define M68K_BKPT_ACK_CALLBACK()    your_bkpt_ack_handler_function()
 
 
@@ -98,7 +101,7 @@
 /* If ON, CPU will call the output reset callback when it encounters a reset
  * instruction.
  */
-#define M68K_EMULATE_RESET          OPT_OFF
+#define M68K_EMULATE_RESET          OPT_ON
 #define M68K_RESET_CALLBACK()       cpu_pulse_reset()
 
 
@@ -123,7 +126,7 @@
 /* If ON, CPU will call the instruction hook callback before every
  * instruction.
  */
-#define M68K_INSTRUCTION_HOOK       OPT_SPECIFY_HANDLER
+#define M68K_INSTRUCTION_HOOK       OPT_ON
 #define M68K_INSTRUCTION_CALLBACK() cpu_instr_callback()
 
 
@@ -135,7 +138,7 @@
  * access a word or longword at an odd address.
  * NOTE: This is only emulated properly for 68000 mode.
  */
-#define M68K_EMULATE_ADDRESS_ERROR  OPT_ON
+#define M68K_EMULATE_ADDRESS_ERROR  OPT_OFF
 
 
 /* Turn ON to enable logging of illegal instruction calls.
@@ -186,5 +189,9 @@
 /* ======================================================================== */
 /* ============================== END OF FILE ============================= */
 /* ======================================================================== */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* M68KCONF__HEADER */

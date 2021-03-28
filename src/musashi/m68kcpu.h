@@ -33,6 +33,10 @@
 #ifndef M68KCPU__HEADER
 #define M68KCPU__HEADER
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "m68k.h"
 #include <limits.h>
 
@@ -180,7 +184,7 @@
 #define RUN_MODE_BERR_AERR_RESET 1
 
 #ifndef NULL
-#define NULL ((void*)0)
+#define NULL nullptr
 #endif
 
 /* ======================================================================== */
@@ -1888,11 +1892,11 @@ m68k_read_memory_8(0x00ffff01);
 
 	m68ki_jump_vector(EXCEPTION_ADDRESS_ERROR);
 
-	/* Use up some clock cycles. Note that we don't need to undo the 
+	/* Use up some clock cycles. Note that we don't need to undo the
 	instruction's cycles here as we've longjmp:ed directly from the
 	instruction handler without passing the part of the excecute loop
 	that deducts instruction cycles */
-	USE_CYCLES(CYC_EXCEPTION[EXCEPTION_ADDRESS_ERROR]); 
+	USE_CYCLES(CYC_EXCEPTION[EXCEPTION_ADDRESS_ERROR]);
 }
 
 
@@ -1981,5 +1985,9 @@ INLINE void m68ki_check_interrupts(void)
 /* ======================================================================== */
 /* ============================== END OF FILE ============================= */
 /* ======================================================================== */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* M68KCPU__HEADER */

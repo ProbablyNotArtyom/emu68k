@@ -1,38 +1,42 @@
 //---------------------------------------------------
 //
-//	ReASM v0.0
+//	emu68k v0.7
 //	NotArtyom
-//	08/05/18
+//	27/03/21
 //
 //---------------------------------------------------
 
-//---------------------Includes----------------------
-
-	#include "config.h"
-	#include "musashi/m68k.h"
-	#include <stdio.h>
-	#include <stdlib.h>
-	#include <stdbool.h>
-	#include <ctype.h>
-	#include <string.h>
+	#include <cstdio>
+	#include <cstdlib>
+	#include <cstdbool>
+	#include <cctype>
+	#include <cstring>
+	#include <string>
+	#include <iostream>
+	#include <libgen.h>
 	#include <gtk/gtk.h>
 	#include <vte/vte.h>
-	#include <libgen.h>
 	#include <pthread.h>
+
+	#include "musashi/m68k.h"
+	#include "emu68k.hpp"
+	#include "system.hpp"
+	#include "memspace.hpp"
+	#include "vinput.hpp"
 
 //------------------Function Protos------------------
 
-GtkWidget 	*SYSconfig;
-GtkWidget 	*Dialog_mm_change;
-GtkWidget 	*Chooser;
-GtkWidget 	*Terminal;
-GtkWidget 	*ui_regentry_frame;
-GtkWidget	*activeSpin;
-GtkWidget	*fileChooser;
-GtkWidget	*memViewBuffer;
-GtkWidget	*memView;
+GtkWidget 		*SYSconfig;
+GtkWidget 		*Dialog_mm_change;
+GtkWidget 		*Chooser;
+GtkWidget 		*Terminal;
+GtkWidget 		*ui_regentry_frame;
+GtkWidget		*activeSpin;
+GtkWidget		*fileChooser;
+GtkTextBuffer	*memViewBuffer;
+GtkWidget		*memView;
 
-GtkBuilder	*builder;
+GtkBuilder		*builder;
 
 //------------------Var Declarations-----------------
 
@@ -52,7 +56,7 @@ int	vte_char_delay = 0;
 // CPU execution Stuff
 int instructions_per_step = 1;
 
-static char 	*helptxt = {
+static std::string helptxt = {
 	"Gtk frontend for the Musashi m68k CPU simulator\r\n"
 	"Usage: emu68k [-hdr][-t tickscale] path_to_rom\r\n"
 	"\r\n"
@@ -78,11 +82,11 @@ int main (int argc, char *argv[]) {
 				autorun = true;
 				break;
 			case 'h':
-				fprintf(stderr, helptxt);
+				std::cerr << helptxt.c_str();
 				exit(0);
 				break;
 			case 'd':
-				printf("Debug mode enabled\n");
+				std::cout << "Debug mode enabled\n";
 				debug = true;
 				break;
 			case 't':
@@ -118,7 +122,7 @@ int main (int argc, char *argv[]) {
 	activeSpin = GTK_WIDGET(gtk_builder_get_object(builder, "activeSpin"));
 	fileChooser = GTK_WIDGET(gtk_builder_get_object(builder, "fileChooser"));
 	memView = GTK_WIDGET(gtk_builder_get_object(builder, "memViewer"));
-	memViewBuffer = gtk_builder_get_object(builder, "textbuffer1");
+	memViewBuffer = GTK_TEXT_BUFFER(gtk_builder_get_object(builder, "textbuffer1"));
 
     gtk_builder_connect_signals(builder, NULL);
 	init_ui();
@@ -140,118 +144,119 @@ int main (int argc, char *argv[]) {
 		gtk_main_iteration();
 		system_tick(tickscale);
 	}
-
     return 0;
 }
 
-void on_Sim_destroy() {
+//---------------------------------------------------
+
+extern "C" void on_Sim_destroy() {
     doExit = true;
 }
 
 void Window_show(GtkWidget *win, gpointer user_data) {
-	gtk_widget_show(user_data);
+	gtk_widget_show(GTK_WIDGET(user_data));
 }
 
 void Window_hide(GtkWidget *win, gpointer user_data) {
-	gtk_widget_hide(user_data);
+	gtk_widget_hide(GTK_WIDGET(user_data));
 }
 
-void on_SYS_prefs_close() {
+extern "C" void on_SYS_prefs_close() {
 	gtk_widget_hide(SYSconfig);
 }
 
-void on_SYS_prefs_response() {
+extern "C" void on_SYS_prefs_response() {
 
 }
 
-void on_PrefsApply_clicked() {
+extern "C" void on_PrefsApply_clicked() {
 	update_sysconfig();
 	gtk_widget_hide(SYSconfig);
 }
 
-void on_PrefsCancel_clicked() {
+extern "C" void on_PrefsCancel_clicked() {
 	gtk_widget_hide(SYSconfig);
 }
 
-void on_ChooseApply_clicked() {
+extern "C" void on_ChooseApply_clicked() {
 	gtk_widget_hide(fileChooser);
-	load_rom(gtk_file_chooser_get_filename(fileChooser));
+	load_rom(gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(fileChooser)));
 }
 
-void on_ChooseCancel_clicked() {
+extern "C" void on_ChooseCancel_clicked() {
 	gtk_widget_hide(fileChooser);
 }
 
-void on_Return_clicked() {
+extern "C" void on_Return_clicked() {
 
 }
 
-void on_Next_clicked() {
+extern "C" void on_Next_clicked() {
 
 }
 
-void on_Reset_clicked() {
+extern "C" void on_Reset_clicked() {
 	freerun = false;
 	m68k_pulse_reset();
+	MemSpace::clear_addrspace_ram();
 	update_ui_regs();
 }
 
-void on_Stop_clicked() {
+extern "C" void on_Stop_clicked() {
 	freerun = false;
 	update_ui_regs();
 }
 
-void on_Pause_clicked() {
+extern "C" void on_Pause_clicked() {
 	freerun = false;
 	update_ui_regs();
 }
 
-void on_Run_clicked() {
+extern "C" void on_Run_clicked() {
 	freerun = true;
 	update_ui_regs();
 }
 
-void on_StepCount_changed() {
-	GtkWidget *tmp = gtk_builder_get_object(builder, "spinbutton1");
+extern "C" void on_StepCount_changed() {
+	GtkSpinButton *tmp = GTK_SPIN_BUTTON(gtk_builder_get_object(builder, "spinbutton1"));
 	instructions_per_step = gtk_spin_button_get_value_as_int(tmp);
 }
 
-void on_Chardelay_changed() {
-	GtkWidget *tmp = gtk_builder_get_object(builder, "VTE_Speed");
+extern "C" void on_Chardelay_changed() {
+	GtkSpinButton *tmp = GTK_SPIN_BUTTON(gtk_builder_get_object(builder, "VTE_Speed"));
 	vte_char_delay = gtk_spin_button_get_value_as_int(tmp);
 }
 
-void on_StepOver_clicked() {
+extern "C" void on_StepOver_clicked() {
 	int tmp = m68k_get_reg(NULL, M68K_REG_PC);
 	m68k_set_reg(M68K_REG_PC, tmp + 4);
 	update_ui_regs();
 }
 
-void on_Steponce_clicked() {
+extern "C" void on_Steponce_clicked() {
 	freerun = false;
 	steps = 1;
 	update_ui_regs();
 }
 
-void on_Step_clicked() {
+extern "C" void on_Step_clicked() {
 	freerun = false;
 	steps = instructions_per_step;
 	update_ui_regs();
 }
 
-unsigned int 	uart_input_buff = 0x00;
-unsigned int	uart_status_byte = 0b00000100;
-void on_Terminal_commit(VteTerminal *vteterminal, guchar *text, guint size, gpointer user_data) {
+unsigned int uart_input_buff = 0x00;
+unsigned int uart_status_byte = 0b00000100;
+extern "C" void on_Terminal_commit(VteTerminal *vteterminal, guchar *text, guint size, gpointer user_data) {
 	uart_input_buff = *text;
 	uart_status_byte = 0b00000101;
 }
 
 //---------------------------------------------------
 
-unsigned int memView_address;
-
-void memViewUpdate(GtkWidget *widget) {
-	char memViewText[100];
+u_int32_t memView_address;
+void memViewUpdate(GtkTextBuffer *widget) {
+	char memViewText[32*16];
 	GtkTextIter start, end;
 	gtk_text_buffer_get_start_iter(memViewBuffer, &start);
 	gtk_text_buffer_get_end_iter(memViewBuffer, &end);
@@ -259,30 +264,29 @@ void memViewUpdate(GtkWidget *widget) {
 	gtk_text_buffer_get_start_iter(memViewBuffer, &start);
 
 	for(int i = 0; i < 32; i++) {
-		format_mem_line(&memViewText, memView_address+(16*i));
-		gtk_text_buffer_insert(widget, &start, &memViewText, -1);
+		format_mem_line(memViewText, memView_address+(16*i));
+		gtk_text_buffer_insert(widget, &start, memViewText, -1);
 	}
 }
 
 void format_mem_line(char *buff, unsigned int addr) {
 	sprintf(buff, "0x%08X | ", addr);
-	for(int i = 0; i < 16; i++){
-		sprintf(buff+i*3 + 12, " %02X", cpu_read_byte(i));
-	}
+	for(int i = 0; i < 16; i++) sprintf(buff+i*3 + 12, " %02X", cpu_read_byte(addr+i));
 	buff[60] = '\n';
 	buff[61] = '\0';
 }
 
-void open_memory_view() {
+extern "C" void open_memory_view() {
+	memViewUpdate(memViewBuffer);
 	gtk_widget_show(memView);
 }
 
-void memView_up() {
+extern "C" void memView_down() {
 	if (memView_address < 0xFFFFFE00) memView_address = memView_address + 0x200;
 	memViewUpdate(memViewBuffer);
 }
 
-void memView_down() {
+extern "C" void memView_up() {
 	if (memView_address > 0x00) memView_address = memView_address - 0x200;
 	memViewUpdate(memViewBuffer);
 }

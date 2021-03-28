@@ -27,7 +27,9 @@
  * THE SOFTWARE.
  */
 
-
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
 
 /* ======================================================================== */
 /* ================================ INCLUDES ============================== */
@@ -3470,6 +3472,9 @@ unsigned int m68k_is_valid_instruction(unsigned int instruction, unsigned int cp
 	return 1;
 }
 
+#ifdef __cplusplus
+}
+#endif
 
 
 /* ======================================================================== */
