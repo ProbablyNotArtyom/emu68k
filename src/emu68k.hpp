@@ -9,9 +9,6 @@
 #ifndef _EMU68K_HEADER
 #define _EMU68K_HEADER
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 	#include <gtk/gtk.h>
 	#include <vte/vte.h>
@@ -94,40 +91,36 @@ static inline void WRITE_LONG(u_int8_t *p, size_t a, u_int32_t v) {
 
 void system_tick(size_t ticks);
 
-void on_Sim_destroy();
-void on_SYS_prefs_close();
-void on_SYS_prefs_response();
-void on_PrefsApply_clicked();
-void on_PrefsCancel_clicked();
-void on_ChooseApply_clicked();
-void on_ChooseCancel_clicked();
-
-void on_Return_clicked();
-void on_Next_clicked();
-void on_Reset_clicked();
-void on_Stop_clicked();
-void on_Pause_clicked();
-void on_Run_clicked();
-void on_StepCount_changed();
-void on_Chardelay_changed();
-void on_StepOver_clicked();
-void on_Steponce_clicked();
-void on_Step_clicked();
-
 void Window_show(GtkWidget *win, gpointer user_data);
 void Window_hide(GtkWidget *win, gpointer user_data);
-void on_Terminal_commit(VteTerminal *vteterminal, guchar *text, guint size, gpointer user_data);
-
 void memViewUpdate(GtkTextBuffer *widget);
 void format_mem_line(char *buff, unsigned int addr);
-void open_memory_view();
-void memView_up();
-void memView_down();
+
+extern "C" void on_Sim_destroy();
+extern "C" void on_SYS_prefs_close();
+extern "C" void on_SYS_prefs_response();
+extern "C" void on_PrefsApply_clicked();
+extern "C" void on_PrefsCancel_clicked();
+extern "C" void on_ChooseApply_clicked();
+extern "C" void on_ChooseCancel_clicked();
+
+extern "C" void on_Return_clicked();
+extern "C" void on_Next_clicked();
+extern "C" void on_Reset_clicked();
+extern "C" void on_Stop_clicked();
+extern "C" void on_Pause_clicked();
+extern "C" void on_Run_clicked();
+extern "C" void on_StepCount_changed();
+extern "C" void on_Chardelay_changed();
+extern "C" void on_StepOver_clicked();
+extern "C" void on_Steponce_clicked();
+extern "C" void on_Step_clicked();
+
+extern "C" void on_Terminal_commit(VteTerminal *vteterminal, guchar *text, guint size, gpointer user_data);
+extern "C" void open_memory_view();
+extern "C" void memView_up();
+extern "C" void memView_down();
 
 //---------------------------------------------------
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

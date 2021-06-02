@@ -184,7 +184,7 @@ extern "C" {
 #define RUN_MODE_BERR_AERR_RESET 1
 
 #ifndef NULL
-#define NULL nullptr
+#define NULL 0
 #endif
 
 /* ======================================================================== */
