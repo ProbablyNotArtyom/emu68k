@@ -1,49 +1,49 @@
-//---------------------------------------------------
+/*####################################################################*/
 //
-//	emu68k v0.7
-//	NotArtyom
-//	27/03/21
+//      emu68k v0.7
+//      NotArtyom
+//      27/03/21
 //
-//---------------------------------------------------
+/*####################################################################*/
 
-	#include <cstdio>
-	#include <cstdlib>
-	#include <cstdbool>
-	#include <cctype>
-	#include <cstring>
-	#include <gtk/gtk.h>
-	#include <vte/vte.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstdbool>
+#include <cctype>
+#include <cstring>
+#include <gtk/gtk.h>
+#include <vte/vte.h>
 
-	#include "musashi/m68k.h"
-	#include "emu68k.hpp"
-	#include "system.hpp"
-	#include "memspace.hpp"
-	#include "hooks.hpp"
-	#include "vinput.hpp"
+#include "musashi/m68k.h"
+#include "emu68k.hpp"
+#include "system.hpp"
+#include "memspace.hpp"
+#include "hooks.hpp"
+#include "vinput.hpp"
 
-//---------------------------------------------------
+/*####################################################################*/
 
-bool	freerun = false;
-int		steps = 0;
+bool freerun = false;
+int steps = 0;
 
-int				cpu_type, cpu_trap_charin, cpu_trap_charout;
-unsigned int	cpu_fcodes;
+int cpu_type, cpu_trap_charin, cpu_trap_charout;
+unsigned int cpu_fcodes;
 
-u_int8_t	*addrspace_ram;
-u_int32_t	ram_start = RAM_START_DEFAULT;
-u_int32_t	ram_end = RAM_END_DEFAULT;
-u_int8_t	*addrspace_rom;
-u_int32_t	rom_start = ROM_START_DEFAULT;
-u_int32_t	rom_end = ROM_END_DEFAULT;
+u_int8_t *addrspace_ram;
+u_int32_t ram_start = RAM_START_DEFAULT;
+u_int32_t ram_end = RAM_END_DEFAULT;
+u_int8_t *addrspace_rom;
+u_int32_t rom_start = ROM_START_DEFAULT;
+u_int32_t rom_end = ROM_END_DEFAULT;
 
-u_int32_t	uart_data = UART_DATA_DEFAULT;
-u_int32_t	uart_status = UART_STATUS_DEFAULT;
+u_int32_t uart_data = UART_DATA_DEFAULT;
+u_int32_t uart_status = UART_STATUS_DEFAULT;
 
-Hooks		*emu68k_hooks;
+Hooks *emu68k_hooks;
 
-//---------------------------------------------------
+/*####################################################################*/
 
-void init_ui(){
+void init_ui() {
 	GtkWidget *tmp;
 	char tmpstr[12];
 
@@ -66,7 +66,7 @@ void init_ui(){
 	sprintf(tmpstr, "%08X", UART_STATUS_DEFAULT);
 	gtk_entry_set_text(GTK_ENTRY(tmp), tmpstr);
 
-	addrspace_ram = (u_int8_t *)malloc(ram_end - ram_start);
+	addrspace_ram = (u_int8_t *) malloc(ram_end - ram_start);
 	if (addrspace_ram == NULL) {
 		printf("[!] Could not allocate memory for ram\n");
 		exit(-1);
@@ -74,7 +74,7 @@ void init_ui(){
 		MemSpace::clear_addrspace_ram();
 	}
 
-	addrspace_rom = (u_int8_t *)malloc(rom_end - rom_start);
+	addrspace_rom = (u_int8_t *) malloc(rom_end - rom_start);
 	if (addrspace_rom == NULL) {
 		printf("[!] Could not allocate memory for rom\n");
 		exit(-1);
@@ -84,7 +84,7 @@ void init_ui(){
 
 	GtkComboBox *cpuval = GTK_COMBO_BOX(gtk_builder_get_object(builder, "CPUselect"));
 	cpu_type = M68K_CPU_TYPE_DEFAULT;
-	switch(cpu_type) {
+	switch (cpu_type) {
 		case M68K_CPU_TYPE_68000:
 			gtk_combo_box_set_active(cpuval, 0);
 			break;
@@ -99,17 +99,17 @@ void init_ui(){
 			break;
 	}
 
-	memView_address = ram_start;	// Set the memory window address to the start of RAM
-	memViewUpdate(memViewBuffer);	// Update the memory window
+	memView_address = ram_start; // Set the memory window address to the start of RAM
+	memViewUpdate(memViewBuffer); // Update the memory window
 
 	m68k_init();
-	emu68k_hooks = new Hooks();		// Install emulation hooks
+	emu68k_hooks = new Hooks(); // Install emulation hooks
 	m68k_set_cpu_type(cpu_type);
 	m68k_pulse_reset();
 	update_ui_regs();
 }
 
-void update_sysconfig(){
+void update_sysconfig() {
 	GtkEntry *tmp;
 	char tmpstr[12];
 	bool modified = false;
@@ -119,8 +119,8 @@ void update_sysconfig(){
 	if (strcmp(gtk_entry_get_text(tmp), tmpstr)) {
 		ram_start = strtoul(gtk_entry_get_text(tmp), NULL, 16);
 		modified = true;
-		memView_address = ram_start;	// Reset the memory window to the start of the new RAM block
-		memViewUpdate(memViewBuffer);	// Update the memory window
+		memView_address = ram_start; // Reset the memory window to the start of the new RAM block
+		memViewUpdate(memViewBuffer); // Update the memory window
 	}
 
 	tmp = GTK_ENTRY(gtk_builder_get_object(builder, "RAMstart1"));
@@ -160,7 +160,7 @@ void update_sysconfig(){
 
 	if (modified) {
 		free(addrspace_ram);
-		addrspace_ram = (u_int8_t *)malloc(ram_end - ram_start);
+		addrspace_ram = (u_int8_t *) malloc(ram_end - ram_start);
 		if (addrspace_ram == NULL) {
 			printf("[!] Could not allocate memory for ram\n");
 			exit(-1);
@@ -169,7 +169,7 @@ void update_sysconfig(){
 		}
 
 		free(addrspace_rom);
-		addrspace_rom = (u_int8_t *)malloc(rom_end - rom_start);
+		addrspace_rom = (u_int8_t *) malloc(rom_end - rom_start);
 		if (addrspace_rom == NULL) {
 			printf("[!] Could not allocate memory for rom\n");
 			exit(-1);
@@ -182,7 +182,7 @@ void update_sysconfig(){
 	}
 
 	GtkComboBox *cpuval = GTK_COMBO_BOX(gtk_builder_get_object(builder, "CPUselect"));
-	switch(gtk_combo_box_get_active(cpuval)) {
+	switch (gtk_combo_box_get_active(cpuval)) {
 		case 0:
 		default:
 			cpu_type = M68K_CPU_TYPE_68000;
@@ -229,7 +229,7 @@ void update_ui_regs() {
 	memViewUpdate(memViewBuffer);
 }
 
-void load_rom(char *fname){
+void load_rom(char *fname) {
 	if (fname != NULL) {
 		printf("loading file: %s\n", fname);
 		FILE *fp = fopen(fname, "rb");
@@ -250,7 +250,7 @@ void load_rom(char *fname){
 	}
 }
 
-void system_tick(size_t ticks){
+void system_tick(size_t ticks) {
 	if (freerun) {
 		gtk_spinner_start(GTK_SPINNER(activeSpin));
 		m68k_execute(ticks);
@@ -267,15 +267,15 @@ void system_tick(size_t ticks){
 	}
 }
 
-void make_hex(char* buff, unsigned int pc, unsigned int length) {
+void make_hex(char *buff, unsigned int pc, unsigned int length) {
 	char *ptr = buff;
 
-	for(; length>0; length -= 2) {
+	for (; length > 0; length -= 2) {
 		sprintf(ptr, "%04x", cpu_read_word_dasm(pc));
 		pc += 2;
 		ptr += 4;
-		if(length > 2) *ptr++ = ' ';
+		if (length > 2) *ptr++ = ' ';
 	}
 }
 
-//---------------------------------------------------
+/*####################################################################*/

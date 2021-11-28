@@ -9,138 +9,6 @@
     <property name="step-increment">1</property>
     <property name="page-increment">10</property>
   </object>
-  <object class="GtkDialog" id="Dialog_mm_change">
-    <property name="can-focus">True</property>
-    <property name="has-focus">True</property>
-    <property name="can-default">True</property>
-    <property name="has-default">True</property>
-    <property name="receives-default">True</property>
-    <property name="title" translatable="yes">Memory mapping has been changed!</property>
-    <property name="resizable">False</property>
-    <property name="type-hint">dialog</property>
-    <property name="urgency-hint">True</property>
-    <property name="deletable">False</property>
-    <child internal-child="vbox">
-      <object class="GtkBox">
-        <property name="can-focus">False</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox">
-            <property name="can-focus">False</property>
-            <property name="layout-style">end</property>
-            <child>
-              <object class="GtkButton" id="WarnOk">
-                <property name="label">gtk-ok</property>
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">True</property>
-                <property name="use-stock">True</property>
-                <signal name="clicked" handler="Window_hide" object="Dialog_mm_change" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkLabel">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="margin-left">8</property>
-            <property name="margin-right">8</property>
-            <property name="margin-top">8</property>
-            <property name="margin-bottom">8</property>
-            <property name="label" translatable="yes">The memory map has been modified!
-Any ROMs will need to be reloaded.</property>
-            <property name="justify">center</property>
-            <property name="wrap">True</property>
-            <attributes>
-              <attribute name="scale" value="1.2"/>
-            </attributes>
-          </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-      </object>
-    </child>
-  </object>
-  <object class="GtkDialog" id="Dialog_size">
-    <property name="can-focus">False</property>
-    <property name="can-default">True</property>
-    <property name="has-default">True</property>
-    <property name="receives-default">True</property>
-    <property name="title" translatable="yes">Memory mapping has been changed!</property>
-    <property name="resizable">False</property>
-    <property name="type-hint">dialog</property>
-    <property name="urgency-hint">True</property>
-    <property name="deletable">False</property>
-    <child internal-child="vbox">
-      <object class="GtkBox">
-        <property name="can-focus">False</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox">
-            <property name="can-focus">False</property>
-            <property name="layout-style">end</property>
-            <child>
-              <object class="GtkButton" id="WarnOk1">
-                <property name="label">gtk-ok</property>
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">True</property>
-                <property name="use-stock">True</property>
-                <signal name="clicked" handler="Window_hide" object="Dialog_size" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkLabel">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="margin-left">8</property>
-            <property name="margin-right">8</property>
-            <property name="margin-top">8</property>
-            <property name="margin-bottom">8</property>
-            <property name="label" translatable="yes">File too large to fit into ROM!</property>
-            <property name="justify">center</property>
-            <property name="wrap">True</property>
-            <attributes>
-              <attribute name="scale" value="1.2"/>
-            </attributes>
-          </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-      </object>
-    </child>
-  </object>
   <object class="GtkAdjustment" id="Stepcount">
     <property name="lower">1</property>
     <property name="upper">100000</property>
@@ -385,7 +253,7 @@ Any ROMs will need to be reloaded.</property>
                         <property name="margin-bottom">6</property>
                         <property name="label-xalign">0</property>
                         <child>
-                          <!-- n-columns=3 n-rows=3 -->
+                          <!-- n-columns=2 n-rows=1 -->
                           <object class="GtkGrid" id="grid1">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
@@ -394,13 +262,13 @@ Any ROMs will need to be reloaded.</property>
                             <property name="row-spacing">6</property>
                             <property name="column-spacing">6</property>
                             <child>
-                              <!-- n-columns=3 n-rows=8 -->
+                              <!-- n-columns=2 n-rows=8 -->
                               <object class="GtkGrid" id="grid2">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
                                 <property name="halign">center</property>
                                 <child>
-                                  <!-- n-columns=3 n-rows=3 -->
+                                  <!-- n-columns=2 n-rows=1 -->
                                   <object class="GtkGrid" id="grid4">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
@@ -445,27 +313,6 @@ Any ROMs will need to be reloaded.</property>
                                         <property name="top-attach">0</property>
                                       </packing>
                                     </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
                                   </object>
                                   <packing>
                                     <property name="left-attach">0</property>
@@ -473,7 +320,7 @@ Any ROMs will need to be reloaded.</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <!-- n-columns=3 n-rows=3 -->
+                                  <!-- n-columns=2 n-rows=1 -->
                                   <object class="GtkGrid" id="grid5">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
@@ -518,27 +365,6 @@ Any ROMs will need to be reloaded.</property>
                                         <property name="top-attach">0</property>
                                       </packing>
                                     </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
                                   </object>
                                   <packing>
                                     <property name="left-attach">0</property>
@@ -546,7 +372,7 @@ Any ROMs will need to be reloaded.</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <!-- n-columns=3 n-rows=3 -->
+                                  <!-- n-columns=2 n-rows=1 -->
                                   <object class="GtkGrid" id="grid6">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
@@ -591,27 +417,6 @@ Any ROMs will need to be reloaded.</property>
                                         <property name="top-attach">0</property>
                                       </packing>
                                     </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
                                   </object>
                                   <packing>
                                     <property name="left-attach">0</property>
@@ -619,7 +424,7 @@ Any ROMs will need to be reloaded.</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <!-- n-columns=3 n-rows=3 -->
+                                  <!-- n-columns=2 n-rows=1 -->
                                   <object class="GtkGrid" id="grid7">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
@@ -664,27 +469,6 @@ Any ROMs will need to be reloaded.</property>
                                         <property name="top-attach">0</property>
                                       </packing>
                                     </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
                                   </object>
                                   <packing>
                                     <property name="left-attach">0</property>
@@ -692,7 +476,7 @@ Any ROMs will need to be reloaded.</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <!-- n-columns=3 n-rows=3 -->
+                                  <!-- n-columns=2 n-rows=1 -->
                                   <object class="GtkGrid" id="grid8">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
@@ -737,27 +521,6 @@ Any ROMs will need to be reloaded.</property>
                                         <property name="top-attach">0</property>
                                       </packing>
                                     </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
                                   </object>
                                   <packing>
                                     <property name="left-attach">0</property>
@@ -765,7 +528,7 @@ Any ROMs will need to be reloaded.</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <!-- n-columns=3 n-rows=3 -->
+                                  <!-- n-columns=2 n-rows=1 -->
                                   <object class="GtkGrid" id="grid9">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
@@ -810,27 +573,6 @@ Any ROMs will need to be reloaded.</property>
                                         <property name="top-attach">0</property>
                                       </packing>
                                     </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
                                   </object>
                                   <packing>
                                     <property name="left-attach">0</property>
@@ -838,7 +580,7 @@ Any ROMs will need to be reloaded.</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <!-- n-columns=3 n-rows=3 -->
+                                  <!-- n-columns=2 n-rows=1 -->
                                   <object class="GtkGrid" id="grid10">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
@@ -883,27 +625,6 @@ Any ROMs will need to be reloaded.</property>
                                         <property name="top-attach">0</property>
                                       </packing>
                                     </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
                                   </object>
                                   <packing>
                                     <property name="left-attach">0</property>
@@ -911,7 +632,7 @@ Any ROMs will need to be reloaded.</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <!-- n-columns=3 n-rows=3 -->
+                                  <!-- n-columns=2 n-rows=1 -->
                                   <object class="GtkGrid" id="grid11">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
@@ -956,27 +677,6 @@ Any ROMs will need to be reloaded.</property>
                                         <property name="top-attach">0</property>
                                       </packing>
                                     </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
                                   </object>
                                   <packing>
                                     <property name="left-attach">0</property>
@@ -984,7 +684,7 @@ Any ROMs will need to be reloaded.</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <!-- n-columns=3 n-rows=3 -->
+                                  <!-- n-columns=2 n-rows=1 -->
                                   <object class="GtkGrid" id="grid12">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
@@ -1029,27 +729,6 @@ Any ROMs will need to be reloaded.</property>
                                         <property name="top-attach">0</property>
                                       </packing>
                                     </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
                                   </object>
                                   <packing>
                                     <property name="left-attach">1</property>
@@ -1057,7 +736,7 @@ Any ROMs will need to be reloaded.</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <!-- n-columns=3 n-rows=3 -->
+                                  <!-- n-columns=2 n-rows=1 -->
                                   <object class="GtkGrid" id="grid13">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
@@ -1102,27 +781,6 @@ Any ROMs will need to be reloaded.</property>
                                         <property name="top-attach">0</property>
                                       </packing>
                                     </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
                                   </object>
                                   <packing>
                                     <property name="left-attach">1</property>
@@ -1130,7 +788,7 @@ Any ROMs will need to be reloaded.</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <!-- n-columns=3 n-rows=3 -->
+                                  <!-- n-columns=2 n-rows=1 -->
                                   <object class="GtkGrid" id="grid14">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
@@ -1175,27 +833,6 @@ Any ROMs will need to be reloaded.</property>
                                         <property name="top-attach">0</property>
                                       </packing>
                                     </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
                                   </object>
                                   <packing>
                                     <property name="left-attach">1</property>
@@ -1203,7 +840,7 @@ Any ROMs will need to be reloaded.</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <!-- n-columns=3 n-rows=3 -->
+                                  <!-- n-columns=2 n-rows=1 -->
                                   <object class="GtkGrid" id="grid15">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
@@ -1248,27 +885,6 @@ Any ROMs will need to be reloaded.</property>
                                         <property name="top-attach">0</property>
                                       </packing>
                                     </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
                                   </object>
                                   <packing>
                                     <property name="left-attach">1</property>
@@ -1276,7 +892,7 @@ Any ROMs will need to be reloaded.</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <!-- n-columns=3 n-rows=3 -->
+                                  <!-- n-columns=2 n-rows=1 -->
                                   <object class="GtkGrid" id="grid16">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
@@ -1321,27 +937,6 @@ Any ROMs will need to be reloaded.</property>
                                         <property name="top-attach">0</property>
                                       </packing>
                                     </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
                                   </object>
                                   <packing>
                                     <property name="left-attach">1</property>
@@ -1349,7 +944,7 @@ Any ROMs will need to be reloaded.</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <!-- n-columns=3 n-rows=3 -->
+                                  <!-- n-columns=2 n-rows=1 -->
                                   <object class="GtkGrid" id="grid17">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
@@ -1394,27 +989,6 @@ Any ROMs will need to be reloaded.</property>
                                         <property name="top-attach">0</property>
                                       </packing>
                                     </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
                                   </object>
                                   <packing>
                                     <property name="left-attach">1</property>
@@ -1422,7 +996,7 @@ Any ROMs will need to be reloaded.</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <!-- n-columns=3 n-rows=3 -->
+                                  <!-- n-columns=2 n-rows=1 -->
                                   <object class="GtkGrid" id="grid18">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
@@ -1467,27 +1041,6 @@ Any ROMs will need to be reloaded.</property>
                                         <property name="top-attach">0</property>
                                       </packing>
                                     </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
                                   </object>
                                   <packing>
                                     <property name="left-attach">1</property>
@@ -1495,7 +1048,7 @@ Any ROMs will need to be reloaded.</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <!-- n-columns=3 n-rows=3 -->
+                                  <!-- n-columns=2 n-rows=1 -->
                                   <object class="GtkGrid" id="grid19">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
@@ -1540,56 +1093,11 @@ Any ROMs will need to be reloaded.</property>
                                         <property name="top-attach">0</property>
                                       </packing>
                                     </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
-                                    <child>
-                                      <placeholder/>
-                                    </child>
                                   </object>
                                   <packing>
                                     <property name="left-attach">1</property>
                                     <property name="top-attach">7</property>
                                   </packing>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
                                 </child>
                               </object>
                               <packing>
@@ -1598,7 +1106,7 @@ Any ROMs will need to be reloaded.</property>
                               </packing>
                             </child>
                             <child>
-                              <!-- n-columns=3 n-rows=3 -->
+                              <!-- n-columns=2 n-rows=3 -->
                               <object class="GtkGrid" id="grid20">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
@@ -1734,41 +1242,11 @@ Any ROMs will need to be reloaded.</property>
                                     <property name="top-attach">0</property>
                                   </packing>
                                 </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
                               </object>
                               <packing>
                                 <property name="left-attach">1</property>
                                 <property name="top-attach">0</property>
                               </packing>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
                             </child>
                           </object>
                         </child>
@@ -1871,7 +1349,7 @@ Any ROMs will need to be reloaded.</property>
                             <property name="margin-bottom">6</property>
                             <property name="label-xalign">0</property>
                             <child>
-                              <!-- n-columns=3 n-rows=4 -->
+                              <!-- n-columns=2 n-rows=4 -->
                               <object class="GtkGrid" id="grid25">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
@@ -2012,18 +1490,6 @@ Any ROMs will need to be reloaded.</property>
                                     <property name="left-attach">1</property>
                                     <property name="top-attach">3</property>
                                   </packing>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
-                                </child>
-                                <child>
-                                  <placeholder/>
                                 </child>
                               </object>
                             </child>
@@ -2210,7 +1676,7 @@ Any ROMs will need to be reloaded.</property>
             <property name="halign">center</property>
             <property name="valign">center</property>
             <child>
-              <!-- n-columns=3 n-rows=5 -->
+              <!-- n-columns=2 n-rows=5 -->
               <object class="GtkGrid" id="grid21">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
@@ -2489,21 +1955,6 @@ Any ROMs will need to be reloaded.</property>
                     <property name="left-attach">0</property>
                     <property name="top-attach">4</property>
                   </packing>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
                 </child>
               </object>
               <packing>
