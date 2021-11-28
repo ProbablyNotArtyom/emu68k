@@ -153,11 +153,11 @@ extern "C" void on_Sim_destroy() {
     doExit = true;
 }
 
-void Window_show(GtkWidget *win, gpointer user_data) {
+extern "C" void Window_show(GtkWidget *win, gpointer user_data) {
 	gtk_widget_show(GTK_WIDGET(user_data));
 }
 
-void Window_hide(GtkWidget *win, gpointer user_data) {
+extern "C" void Window_hide(GtkWidget *win, gpointer user_data) {
 	gtk_widget_hide(GTK_WIDGET(user_data));
 }
 
@@ -251,6 +251,10 @@ extern "C" void on_Terminal_commit(VteTerminal *vteterminal, guchar *text, guint
 	uart_input_buff = *text;
 	uart_status_byte = 0b00000101;
 }
+
+//---------------------------------------------------
+
+
 
 //---------------------------------------------------
 

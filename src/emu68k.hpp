@@ -91,8 +91,8 @@ static inline void WRITE_LONG(u_int8_t *p, size_t a, u_int32_t v) {
 
 void system_tick(size_t ticks);
 
-void Window_show(GtkWidget *win, gpointer user_data);
-void Window_hide(GtkWidget *win, gpointer user_data);
+extern "C" void Window_show(GtkWidget *win, gpointer user_data);
+extern "C" void Window_hide(GtkWidget *win, gpointer user_data);
 void memViewUpdate(GtkTextBuffer *widget);
 void format_mem_line(char *buff, unsigned int addr);
 
