@@ -3,7 +3,7 @@
 <interface>
   <requires lib="gtk+" version="3.12"/>
   <requires lib="vte-2.91" version="0.42"/>
-  <!-- interface-css-provider-path styles.css -->
+  <!-- interface-css-provider-path style.css -->
   <object class="GtkAdjustment" id="Chardelay">
     <property name="upper">10000</property>
     <property name="step-increment">1</property>
@@ -1544,6 +1544,7 @@
                     <property name="scroll-on-keystroke">True</property>
                     <property name="scroll-on-output">False</property>
                     <signal name="commit" handler="on_Terminal_commit" swapped="no"/>
+                    <signal name="realize" handler="on_Terminal_realize" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>

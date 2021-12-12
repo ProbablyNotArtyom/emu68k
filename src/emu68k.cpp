@@ -13,9 +13,14 @@
 #include <cstring>
 #include <string>
 #include <iostream>
+#include <filesystem>
+
 #include <libgen.h>
 #include <gtk/gtk.h>
 #include <vte/vte.h>
+#include <pango/pango.h>
+#include <pango/pangoft2.h>
+#include <freetype/freetype.h>
 #include <pthread.h>
 
 #include "musashi/m68k.h"
@@ -39,6 +44,12 @@ GtkTextView *memViewArea;
 
 GtkBuilder *builder;
 
+std::filesystem::path bindir;
+std::filesystem::path resdir;
+std::filesystem::path glade_ui;
+std::filesystem::path glade_css;
+std::filesystem::path vte_font;
+
 /*####################################################################*/
 
 #define ui_regentry_lock()		gtk_widget_set_sensitive(ui_regentry_frame, false)
@@ -58,22 +69,23 @@ int vte_char_delay = 0;
 int instructions_per_step = 1;
 
 static std::string helptxt = {
-	"Gtk frontend for the Musashi m68k CPU simulator\r\n						\
-	Usage: emu68k [-hdr][-t tickscale] path_to_rom\r\n							\
-	\r\n																		\
-	    -h               shows this help text\r\n								\
-	    -r               automatically reset & run the CPU\r\n	 				\
-	                     requires a ROM to be passed from the shell\r\n			\
-	    -d               enables debug mode\r\n									\
-	    -t tickscale     set the number of cycles in each emulation tick\r\n	\
-	                     this is effectively a simulation speed multiplier\r\n	\
-	                     high tickscales increase performance by sacrificing IO bandwith\r\n"
+	"Gtk frontend for the Musashi m68k CPU simulator\r\n"						
+	"Usage: emu68k [-hdr][-t tickscale] path_to_rom\r\n"							
+	"\r\n"																
+	"    -h               shows this help text\r\n"								
+	"    -r               automatically reset & run the CPU\r\n"	 				
+	"                     requires a ROM to be passed from the shell\r\n"			
+	"    -d               enables debug mode\r\n"								
+	"    -t tickscale     set the number of cycles in each emulation tick\r\n"
+	"                     this is effectively a simulation speed multiplier\r\n"
+	"                     high tickscales increase performance by sacrificing IO bandwith\r\n"
 };
 
 /*####################################################################*/
 
 int main(int argc, char *argv[]) {
 	GtkWidget *window;
+	GError *error = NULL;
 	int opt, tickscale = 100000;
 	char *rom_filename = NULL;
 
@@ -87,12 +99,12 @@ int main(int argc, char *argv[]) {
 				exit(0);
 				break;
 			case 'd':
-				if (!debug) std::cout << "Debug mode enabled\n";
+				if (!debug) std::cout << "debug mode enabled\n";
 				debug++;
 				break;
 			case 't':
 				tickscale = strtoul(optarg, NULL, 10);
-				printf("tickscale set to %d\n", tickscale);
+				DEBUG_PRINTF(1, "tickscale set to %d\n", tickscale);
 				break;
 			default:
 				break;
@@ -100,22 +112,36 @@ int main(int argc, char *argv[]) {
 	}
 
 	for (int index = optind; index < argc; index++) {
-		DEBUG_PRINTF(1, "Parsed ROM file: %s\n", argv[index]);
+		DEBUG_PRINTF(1, "parsed ROM file: %s\n", argv[index]);
 		rom_filename = argv[index];
 	}
 
+	/* Create GTK main context */
 	gtk_init(&argc, &argv);
 	builder = gtk_builder_new();
+	DEBUG_PRINTF(1, "creating GTK context\n");
+	
+	/* Find the install location of the binary in this system */
+	bindir = std::filesystem::read_symlink("/proc/self/exe").parent_path();
+	DEBUG_PRINTF(1, "detected runtime dir: %s\n", bindir.c_str());
 
-	/* find the install location of the binary in this system */
-	char bindir[400];
-	ssize_t pathsize = readlink("/proc/self/exe", bindir, sizeof(bindir) - 1);
-	char gladeptr[400];
-
-	strcpy(gladeptr, dirname(bindir));
-	strcat(gladeptr, "/GTK.glade");
-	gtk_builder_add_from_file(builder, gladeptr, NULL);
-
+	/* Compose the full path to the resource directory */
+	resdir = std::filesystem::path(bindir).concat("/res");
+	DEBUG_PRINTF(1, "detected resource dir: %s\n", resdir.c_str());
+	
+	/* Load the glade builder UI file */
+	glade_ui = std::filesystem::path(resdir).concat("/GTK.glade");
+	gtk_builder_add_from_file(builder, glade_ui.c_str(), NULL);
+	DEBUG_PRINTF(1, "using glade UI found at: %s\n", glade_ui.c_str());
+	
+	/* Load the included font resource for use with the vte */
+	vte_font = std::filesystem::path(resdir).concat("/font.otb");
+	DEBUG_PRINTF(1, "using font found at: %s\n", vte_font.c_str());
+	
+	/* Load the css stylesheet so we can theme some UI elements */
+	glade_css = std::filesystem::path(resdir).concat("/style.css");
+	DEBUG_PRINTF(1, "using CSS stylesheet found at: %s\n", glade_css.c_str());
+	
 	window = GTK_WIDGET(gtk_builder_get_object(builder, "Sim_main"));
 	SYSconfig = GTK_WIDGET(gtk_builder_get_object(builder, "SYS_prefs"));
 	Dialog_mm_change = GTK_WIDGET(gtk_builder_get_object(builder, "Dialog_mm_change"));
@@ -124,12 +150,24 @@ int main(int argc, char *argv[]) {
 	ui_regentry_frame = GTK_WIDGET(gtk_builder_get_object(builder, "grid1"));
 	activeSpin = GTK_WIDGET(gtk_builder_get_object(builder, "activeSpin"));
 	fileChooser = GTK_WIDGET(gtk_builder_get_object(builder, "fileChooser"));
-	
-	
 	memView = GTK_WIDGET(gtk_builder_get_object(builder, "memViewer"));
 	memViewArea = GTK_TEXT_VIEW(gtk_builder_get_object(builder, "memViewArea"));
 	memViewBuffer = GTK_TEXT_BUFFER(gtk_builder_get_object(builder, "textbuffer1"));
-	gtk_text_view_set_monospace(memViewArea, true);
+	
+	/* Apply a CSS stylesheet to various things */
+	GtkCssProvider *cssProvider = gtk_css_provider_new(); 
+	gtk_css_provider_load_from_path(cssProvider, glade_css.c_str(), &error);
+	GtkStyleContext *context = gtk_widget_get_style_context(GTK_WIDGET(memViewArea));  
+	gtk_style_context_add_provider(
+		context,
+		GTK_STYLE_PROVIDER(cssProvider),
+		GTK_STYLE_PROVIDER_PRIORITY_APPLICATION
+	);
+	gtk_style_context_add_provider_for_screen(
+		gdk_screen_get_default(),
+		GTK_STYLE_PROVIDER(cssProvider),
+		GTK_STYLE_PROVIDER_PRIORITY_USER
+	);
 	
 	gtk_builder_connect_signals(builder, NULL);
 	init_ui();
@@ -252,11 +290,21 @@ extern "C" void on_Step_clicked() {
 	update_ui_regs();
 }
 
+/*####################################################################*/
+
 unsigned int uart_input_buff = 0x00;
 unsigned int uart_status_byte = u_int(4);
 extern "C" void on_Terminal_commit(VteTerminal * vteterminal, guchar * text, guint size, gpointer user_data) {
 	uart_input_buff = *text;
 	uart_status_byte = u_int(5);
+}
+
+extern "C" void on_Terminal_realize(VteTerminal * vteterminal, guchar * text, guint size, gpointer user_data) {
+	const PangoFontDescription *font = vte_terminal_get_font(vteterminal);
+	DEBUG_PRINTF(1, "current VTE font: %s\n", pango_font_description_to_string(font));
+	font = pango_font_description_from_string("terminus 10");
+	vte_terminal_set_font(vteterminal, font);
+	DEBUG_PRINTF(1, "setting VTE font: %s\n", pango_font_description_to_string(font));
 }
 
 /*####################################################################*/

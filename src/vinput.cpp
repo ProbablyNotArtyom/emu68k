@@ -23,10 +23,6 @@
 
 /*####################################################################*/
 
-extern bool doExit;
-extern bool debug;
-extern int vte_char_delay;
-
 fifo_t vte_buffer;
 int vte_buffer_count;
 bool vte_buffer_lock;
@@ -61,7 +57,9 @@ char vte_fifo_get(fifo_t * fifo) {
 		tmp = fifo->buffer[fifo->tail];
 		fifo->tail++;
 		if (fifo->tail == VTE_BUFFER_MAX_SIZE) fifo->tail = 0;
-		if (!iscntrl(tmp)) DEBUG_PRINTF(2, "vte fifo get: \'%c\', head %d, tail %d\n", tmp, fifo->head, fifo->tail);
+		if (!iscntrl(tmp)) {
+			DEBUG_PRINTF(2, "vte fifo get: \'%c\', head %d, tail %d\n", tmp, fifo->head, fifo->tail);
+		}
 	} else return char (NULL);
 	return tmp;
 }
@@ -71,7 +69,9 @@ int vte_fifo_add(fifo_t * fifo, char val) {
 	fifo->buffer[fifo->head] = val;
 	fifo->head++;
 	if (fifo->head == VTE_BUFFER_MAX_SIZE) fifo->head = 0;
-	if (!iscntrl(val)) DEBUG_PRINTF(2, "vte fifo add: \'%c\', head %d, tail %d\n", val, fifo->head, fifo->tail);
+	if (!iscntrl(val)) {
+		DEBUG_PRINTF(2, "vte fifo add: \'%c\', head %d, tail %d\n", val, fifo->head, fifo->tail);
+	}
 	return true;
 }
 

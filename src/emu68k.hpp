@@ -56,6 +56,11 @@ extern unsigned int uart_status_byte;
 
 extern u_int32_t memView_address;
 
+extern bool doExit;
+extern bool running;
+extern bool autorun;
+extern int debug;	
+
 void load_rom(char *fname);
 
 /*####################################################################*/

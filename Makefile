@@ -18,51 +18,58 @@ LD = ld
 
 BASEDIR := $(shell pwd)
 BINDIR := $(BASEDIR)/bin
+OBJDIR := $(BASEDIR)/obj
+SRCDIR := $(BASEDIR)/src
+RESDIR := $(BASEDIR)/res
 BINARY_NAME := emu68k
+
 SOURCES := $(shell find ./src -name '*.c')
 SOURCES_CXX := $(shell find ./src -name '*.cpp')
-OBJECTS := $(foreach tmp, $(SOURCES:%.c=%.o), $(BINDIR)/$(tmp))
-OBJECTS_CXX := $(foreach tmp, $(SOURCES_CXX:%.cpp=%.o), $(BINDIR)/$(tmp))
+OBJECTS := $(foreach tmp, $(SOURCES:%.c=%.o), $(OBJDIR)/$(tmp))
+OBJECTS_CXX := $(foreach tmp, $(SOURCES_CXX:%.cpp=%.o), $(OBJDIR)/$(tmp))
 
-CFLAGS := -rdynamic -fPIE -w $(shell pkg-config --cflags --libs glibmm-2.4 gtk+-3.0 vte-2.91)
-CXXFLAGS := -xc++ -rdynamic -fPIE -w $(shell pkg-config --cflags-only-I --libs glibmm-2.4 gtk+-3.0 vte-2.91)
-LDFLAGS := -w -rdynamic -fwhole-program $(shell pkg-config --libs glibmm-2.4 gtk+-3.0 vte-2.91)
+CFLAGS := -rdynamic -fPIE -w $(shell pkg-config --cflags --libs glibmm-2.4 gtk+-3.0 vte-2.91 pango)
+CXXFLAGS := -xc++ -rdynamic -fPIE -w $(shell pkg-config --cflags-only-I --libs glibmm-2.4 gtk+-3.0 vte-2.91 pango)
+LDFLAGS := -w -rdynamic -fwhole-program $(shell pkg-config --libs glibmm-2.4 gtk+-3.0 vte-2.91 pango)
 
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 .PHONY: all clean test install uninstall
 all: $(OBJECTS_CXX) $(OBJECTS) $(BINARY_NAME)
-	cp $(BASEDIR)/src/GTK.glade $(BINDIR)
+	@echo "[--] Copying resources"
+	@cp -R $(RESDIR) $(BINDIR)
+	@echo "[--] cp -R $(RESDIR) $(BINDIR)"
 
 .SECONDEXPANSION :
 $(BINARY_NAME): $(OBJECTS_CXX) $(OBJECTS)
 	@echo "[LD] Creating final binary"
-	@$(CC) $(shell find $(BINDIR) -name '*.o') $(LDFLAGS) -o $(BINDIR)/$@ -lstdc++ -pthread
+	@mkdir -p $(BINDIR)
+	@$(CC) $(shell find $(OBJDIR) -name '*.o') $(LDFLAGS) -o $(BINDIR)/$@ -lstdc++ -pthread
 
-$(OBJECTS): $$(patsubst $$(BINDIR)%.o, $$(BASEDIR)%.c, $$@)
-	@echo "[CC] -c $(shell realpath -m --relative-to=$(PWD) $(patsubst $(BINDIR)%, $(BASEDIR)%, $(@:%.o=%.c))) -o $(shell realpath -m --relative-to=$(PWD) $(@))"
+$(OBJECTS): $$(patsubst $$(OBJDIR)%.o, $$(BASEDIR)%.c, $$@)
+	@echo "[CC] -c $(shell realpath -m --relative-to=$(PWD) $(patsubst $(OBJDIR)%, $(BASEDIR)%, $(@:%.o=%.c))) -o $(shell realpath -m --relative-to=$(PWD) $(@))"
 	@mkdir -p $(dir $@)
-	@$(CC) $(CFLAGS) -c $(patsubst $(BINDIR)%, $(BASEDIR)%, $(@:%.o=%.c)) -o $@ -pthread
+	@$(CC) $(CFLAGS) -c $(patsubst $(OBJDIR)%, $(BASEDIR)%, $(@:%.o=%.c)) -o $@ -pthread
 
-$(OBJECTS_CXX): $$(patsubst $$(BINDIR)%.o, $$(BASEDIR)%.cpp, $$@)
-	@echo "[CPP] -c $(shell realpath -m --relative-to=$(PWD) $(patsubst $(BINDIR)%, $(BASEDIR)%, $(@:%.o=%.cpp))) -o $(shell realpath -m --relative-to=$(PWD) $(@))"
+$(OBJECTS_CXX): $$(patsubst $$(OBJDIR)%.o, $$(BASEDIR)%.cpp, $$@)
+	@echo "[CPP] -c $(shell realpath -m --relative-to=$(PWD) $(patsubst $(OBJDIR)%, $(BASEDIR)%, $(@:%.o=%.cpp))) -o $(shell realpath -m --relative-to=$(PWD) $(@))"
 	@mkdir -p $(dir $@)
-	@$(CC) $(CXXFLAGS) -c $(patsubst $(BINDIR)%, $(BASEDIR)%, $(@:%.o=%.cpp)) -o $@ -pthread
+	@$(CC) $(CXXFLAGS) -c $(patsubst $(OBJDIR)%, $(BASEDIR)%, $(@:%.o=%.cpp)) -o $@ -pthread
 
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 clean:
-	mkdir -p $(BINDIR)
-	rm $(BINDIR)/* -vfr
+	rm $(OBJDIR) -vfr
+	rm $(BINDIR) -vfr
 
 test: $(BINARY_NAME)
-	cd $(BINDIR) && ./$(BINARY_NAME) -t 1000000 -r $(BASEDIR)/test/gdos.bin && cd $(BASEDIR)
+	$(BINDIR)/$(BINARY_NAME) -d -t 1000000 -r $(BASEDIR)/test/gdos.bin
 
 install:
-	sudo mkdir -vp $(PREFIX)/emu68k/
-	sudo cp $(BINDIR)/$(BINARY_NAME) $(BINDIR)/GTK.glade $(PREFIX)/emu68k
-	sudo ln -s $(PREFIX)/emu68k/$(BINARY_NAME) /usr/bin/
+	mkdir -vp $(PREFIX)/emu68k/
+	cp -R $(BINDIR)/* $(PREFIX)/emu68k
+	ln -s $(PREFIX)/emu68k/$(BINARY_NAME) /usr/bin/$(BINARY_NAME)
 
 uninstall:
-	sudo rm -rf $(PREFIX)/emu68k
-	sudo rm -f /usr/bin/$(BINARY_NAME)
+	rm -rf $(PREFIX)/emu68k
+	rm -f /usr/bin/$(BINARY_NAME)
